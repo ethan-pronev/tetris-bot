@@ -3,8 +3,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
 
+from clients.client import TetrisClient
+from tetris import Piece, Move, GameState
 
-class JstrisClient():
+
+class JstrisClient(TetrisClient):
 	def __init__(self):
 		self.page = webdriver.Chrome()
 		self.page.get("https://jstris.jezevec10.com/")
@@ -26,35 +29,34 @@ class JstrisClient():
 		link = self.page.find_element(By.CLASS_NAME, "joinLink")
 		print(f"Room URL: {link.text}")
 
-	def get_game_state(self):
+	def join_room(self, code):
+		self.page.get(f"https://jstris.jezevec10.com/join/{code}")
+
+	def get_game_state(self) -> GameState:
 		# TODO: get game state from jstris screenshot
 
-		return {
-			"held": None,
-			"upcoming": [],
-			"board": [],
-		}
+		return GameState([], [Piece.I], None)
 
-	def play_move(self, move):
+	def play_move(self, move: Move):
 		body = self.page.find_element(By.CSS_SELECTOR, "body")
 
 		keys = []
 
-		if move == "hold":
+		if move.hold:
 			keys.append("c")
 
 		else:
-			if move["rotation"] == 90:
+			if move.rotation == 90:
 				keys.append(Keys.UP)
-			elif move["rotation"] == 180:
+			elif move.rotation== 180:
 				keys.append("a")
-			elif move["rotation"] == 270:
+			elif move.rotation == 270:
 				keys.append("z")
 
-			if move["offset"] > 0:
-				keys += [Keys.RIGHT for _ in range(move["offset"])]
-			elif move["offset"] < 0:
-				keys += [Keys.LEFT for _ in range(-move["offset"])]
+			if move.offset > 0:
+				keys += [Keys.RIGHT for _ in range(move.offset)]
+			elif move.offset < 0:
+				keys += [Keys.LEFT for _ in range(-move.offset)]
 
 			keys.append(Keys.SPACE)
 

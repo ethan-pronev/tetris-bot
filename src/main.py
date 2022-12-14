@@ -5,10 +5,11 @@ from strategies.sprint_tetris import SprintTetrisStrategy
 
 def main():
     controller = GameController(
-        room="host",
         pps=1,
         client=JstrisClient(),
-        strategy=SprintTetrisStrategy()
+        strategy=SprintTetrisStrategy(),
+        room="join",
+        join_info="CK4FRH"
     )
 
     controller.start()
