@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class Piece(Enum):
@@ -21,7 +22,8 @@ class Move():
 
 
 class GameState():
-    def __init__(self, board, upcoming: list[Piece], held: Piece | None = None):
+    def __init__(self, board, current: Piece, upcoming: List[Piece], held: Piece | None = None):
         self.board = board
+        self.current = current
         self.upcoming = upcoming
         self.held = held

@@ -27,10 +27,16 @@ class GameController():
     def run_game(self):
         th.Thread(target=self.key_capture_thread, args=(), name="key_capture_thread", daemon=True).start()
         while self.game_active:
+            start_time = time.time()
+
             state = self.client.get_game_state()
             move = self.strategy.make_move(state)
             self.client.play_move(move)
-            time.sleep(1 / self.pps)
+
+            delta = time.time() - start_time
+            sleep_len = 1 / self.pps - delta
+            if sleep_len > 0:
+                time.sleep(sleep_len)
 
     def start(self):
         while True:
