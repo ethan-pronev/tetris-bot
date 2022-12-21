@@ -1,19 +1,12 @@
 from tetris import Move, GameState
 from strategies.strategy import TetrisStrategy
+from algorithms.tetris import TetrisAlgorithm
 
 
 class SprintTetrisStrategy(TetrisStrategy):
 	def __init__(self):
-		pass
+		self. tetris_algo: TetrisAlgorithm = TetrisAlgorithm()
 
+	# This strategy is meant for sprint mode, so no need to worry about garbage/downstacking/etc.
 	def make_move(self, state: GameState) -> Move:
-		# TODO: make algorithm to determine next move from given state
-
-		# print(f"queue: {state.upcoming}")
-		# print(f"current: {state.current}")
-		# print(f"held: {state.held}")
-		# print("board:")
-		# for row in state.board[::-1]:
-		# 	print("".join(["O" if a else "." for a in row]))
-
-		return Move(rotation=0, offset=0, hold=False)
+		return self.tetris_algo.make_move(state)

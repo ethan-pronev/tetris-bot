@@ -8,23 +8,24 @@ from selenium.webdriver.common.by import By
 import time
 
 from clients.client import TetrisClient
-from tetris import Piece, Move, GameState
+from tetris import Board, Piece, Move, GameState
 
 
 class JstrisClient(TetrisClient):
-	def __init__(self):
+	def __init__(self, headless=False):
 		chrome_options = Options()
-		# chrome_options.add_argument("--headless")
-		# chrome_options.add_argument("window-size=1920,1080")
+		if headless:
+			chrome_options.add_argument("--headless")
+			chrome_options.add_argument("window-size=1920,1080")
 
 		self.page = webdriver.Chrome(options=chrome_options)
 		self.page.get("https://jstris.jezevec10.com/")
 
-	def _click_buttons(self, ids):
+	def _click_buttons(self, ids, waitTime=1):
 		for id in ids:
+			time.sleep(waitTime)
 			button = self.page.find_element(By.ID, id)
 			button.click()
-			time.sleep(1)
 	
 	def _get_piece_from_pixels(self, pixels) -> Piece | None:
 		if (227,91,2,255) in pixels:
@@ -45,7 +46,9 @@ class JstrisClient(TetrisClient):
 			return None
 
 	def create_room(self):
-		self._click_buttons(["lobby", "createRoomButton", "isPrivate", "create", "lobby", "editRoomButton"])
+		self._click_buttons(["lobby", "createRoomButton", "isPrivate", "create"])
+		self._click_buttons(["lobby"], waitTime=2)
+		self._click_buttons(["editRoomButton"])
 
 		gravity_field = self.page.find_element(By.ID, "gravityLvl")
 		gravity_field.send_keys([Keys.BACK_SPACE, "0"])
@@ -69,7 +72,7 @@ class JstrisClient(TetrisClient):
 				pixel = image.getpixel((24*j+118,24*i+12))
 				row.append(self._get_piece_from_pixels([pixel]) is not None)
 			board.append(row)
-		board.append([]) # to not count current piece at top
+		board.append([False for _ in range(10)]) # to not count current piece at top
 
 		current = self._get_piece_from_pixels([image.getpixel((214,12))])
 
@@ -89,7 +92,7 @@ class JstrisClient(TetrisClient):
 			]
 		)
 
-		return GameState(board, current, queue, hold)
+		return GameState(Board(board), current, queue, hold)
 
 	def play_move(self, move: Move):
 		body = self.page.find_element(By.CSS_SELECTOR, "body")
