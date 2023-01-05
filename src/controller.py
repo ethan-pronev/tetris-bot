@@ -2,12 +2,12 @@ import threading as th
 import time
 from typing import Literal
 
-from clients.client import TetrisClient
-from strategies.strategy import TetrisStrategy
+from clients.client import Client
+from strategies.strategy import Strategy
 
 
 class GameController():
-    def __init__(self, pps, client: TetrisClient, strategy: TetrisStrategy, room: Literal["host", "join"], join_info=None):
+    def __init__(self, pps, client: Client, strategy: Strategy, room: Literal["host", "join"], join_info=None):
         self.game_active = False
         self.pps = pps
         self.client = client

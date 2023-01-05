@@ -7,11 +7,11 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
 
-from clients.client import TetrisClient
-from tetris import Board, Piece, Move, GameState
+from clients.client import Client
+from game_types import Board, Piece, Move, GameState
 
 
-class JstrisClient(TetrisClient):
+class JstrisClient(Client):
 	def __init__(self, headless=False):
 		chrome_options = Options()
 		if headless:

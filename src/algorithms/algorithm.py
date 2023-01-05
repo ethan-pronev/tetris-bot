@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from tetris import Move, GameState
+from game_types import Move, GameState
 
 
-class TetrisAlgorithm(ABC):
+class Algorithm(ABC):
     @abstractmethod
     def make_move(self, state: GameState) -> Move:
         pass

@@ -1,15 +1,15 @@
 from controller import GameController
 from clients.jstris import JstrisClient
-from strategies.sprint_tetris import SprintTetrisStrategy
+from strategies.sprint import SprintStrategy
 
 
 def main():
     controller = GameController(
         pps=1,
         client=JstrisClient(headless=False),
-        strategy=SprintTetrisStrategy(),
+        strategy=SprintStrategy(),
         room="join",
-        join_info="3RD3GN"
+        join_info="OLYTFL"
     )
 
     controller.start()

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from tetris import Move, GameState
+from game_types import Move, GameState
 
 
-class TetrisClient(ABC):
+class Client(ABC):
     @abstractmethod
     def create_room(self):
         pass

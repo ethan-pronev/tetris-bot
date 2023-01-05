@@ -1,9 +1,8 @@
-from tetris import Move, GameState
-from algorithms.algorithm import TetrisAlgorithm
+from game_types import Move, GameState
+from algorithms.algorithm import Algorithm
 
 
-class TetrisAlgorithm(TetrisAlgorithm):
-	def make_move(self, state: GameState) -> Move:
-		# TODO: make tetris algorithm
-
-		return Move(rotation=0, offset=0, hold=False)
+class TetrisAlgorithm(Algorithm):
+    def make_move(self, state: GameState) -> Move:
+        # TODO: make tetris algorithm
+        raise RuntimeError("Not implemented")

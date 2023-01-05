@@ -30,7 +30,7 @@ class Piece(Enum):
 
 
 class Move():
-    def __init__(self, rotation, offset, hold=False):
+    def __init__(self, rotation: int, offset: int, hold: bool=False):
         assert(rotation in [0, 90, 180, 270])
 
         self.rotation = rotation
