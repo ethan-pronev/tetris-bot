@@ -1,7 +1,8 @@
-import threading as th
+import multiprocessing as mp
 import time
 from typing import Literal
 
+from game_types import Piece, Move
 from clients.client import Client
 from strategies.strategy import Strategy
 
@@ -21,15 +22,26 @@ class GameController():
             raise RuntimeError("Invalid room type")
 
     def key_capture_thread(self):
-        input("press ENTER to stop playing: ")
-        self.game_active = False
+        try:
+            input("press ENTER to stop playing: ")
+            # self.game_active = False
+        except: # in case this process is killed below, ignore EOF error
+            return
 
     def run_game(self):
-        th.Thread(target=self.key_capture_thread, args=(), name="key_capture_thread", daemon=True).start()
+        proc = mp.Process(target=self.key_capture_thread, args=(), name="key_capture_thread", daemon=True)
+        proc.start()
         while self.game_active:
             start_time = time.time()
 
             state = self.client.get_game_state()
+            if state is None:
+                proc.kill()
+                self.game_active = False
+                self.client.play_move(Move(Piece.I, 0, 3)) # if we've reached the very top of the board, the next piece will spawn above the board, so drop it just in case
+                print("")
+                return
+
             move = self.strategy.make_move(state)
             self.client.play_move(move)
 

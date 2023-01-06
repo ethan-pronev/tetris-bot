@@ -10,6 +10,51 @@ import time
 from clients.client import Client
 from game_types import Board, Piece, Move, GameState
 
+_PIECE_POSITIONS = {
+	Piece.L: {
+		0: 3,
+		90: 4,
+		180: 3,
+		270: 3,
+	},
+	Piece.J: {
+		0: 3,
+		90: 4,
+		180: 3,
+		270: 3,
+	},
+	Piece.S: {
+		0: 3,
+		90: 4,
+		180: 3,
+		270: 3,
+	},
+	Piece.Z: {
+		0: 3,
+		90: 4,
+		180: 3,
+		270: 3,
+	},
+	Piece.O: {
+		0: 4,
+		90: 4,
+		180: 4,
+		270: 4,
+	},
+	Piece.I: {
+		0: 3,
+		90: 5,
+		180: 3,
+		270: 4,
+	},
+	Piece.T: {
+		0: 3,
+		90: 4,
+		180: 3,
+		270: 3,
+	},
+}
+
 
 class JstrisClient(Client):
 	def __init__(self, headless=False):
@@ -42,19 +87,20 @@ class JstrisClient(Client):
 			return Piece.O
 		elif (175,41,138,255) in pixels:
 			return Piece.T
+		elif (153,153,153,255) in pixels:
+			return "Garbage"
 		else:
 			return None
 
 	def create_room(self):
-		self._click_buttons(["lobby", "createRoomButton", "isPrivate", "create"])
-		self._click_buttons(["lobby"], waitTime=2)
-		self._click_buttons(["editRoomButton"])
+		self._click_buttons(["lobby", "createRoomButton", "isPrivate", "more_adv"])
 
 		gravity_field = self.page.find_element(By.ID, "gravityLvl")
 		gravity_field.send_keys([Keys.BACK_SPACE, "0"])
 
 		self._click_buttons(["create"])
 
+		time.sleep(2)
 		link = self.page.find_element(By.CLASS_NAME, "joinLink")
 		print(f"Room URL: {link.text}")
 
@@ -92,6 +138,10 @@ class JstrisClient(Client):
 			]
 		)
 
+		# in jstris we know the game is finished when no current piece is detected (board is greyed out)
+		if current is None:
+			return None
+
 		return GameState(Board(board), current, queue, hold)
 
 	def play_move(self, move: Move):
@@ -109,10 +159,11 @@ class JstrisClient(Client):
 		elif move.rotation == 270:
 			keys.append("z")
 
-		if move.offset > 0:
-			keys += [Keys.RIGHT for _ in range(move.offset)]
-		elif move.offset < 0:
-			keys += [Keys.LEFT for _ in range(-move.offset)]
+		offset = move.position - _PIECE_POSITIONS[move.piece][move.rotation]
+		if offset > 0:
+			keys += [Keys.RIGHT for _ in range(offset)]
+		elif offset < 0:
+			keys += [Keys.LEFT for _ in range(-offset)]
 
 		keys.append(Keys.SPACE)
 

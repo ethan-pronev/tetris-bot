@@ -13,7 +13,7 @@ class Client(ABC):
         pass
 
     @abstractmethod
-    def get_game_state(self) -> GameState:
+    def get_game_state(self) -> GameState | None:
         pass
 
     @abstractmethod
