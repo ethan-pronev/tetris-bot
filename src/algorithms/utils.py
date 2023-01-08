@@ -1,21 +1,21 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from game_types import Board, Piece, Move, GameState
 
 
-def _get_boards(board: Board, pieces: List[Piece], first_move=None, first_hold=False) -> List[Tuple[Board, Move]]:
+def _get_boards(board: Board, left_col: int, right_col: int, pieces: List[Piece], first_move=None, first_hold=False) -> List[Tuple[Board, Move]]:
     piece = pieces[0]
     boards = []
 
     placements = [] # rotation-position tuples
     if piece in [Piece.L, Piece.J, Piece.T]:
-        placements = [(rot, pos) for rot in [0,180] for pos in range(8)] + [(rot, pos) for rot in [90,270] for pos in range(9)]
+        placements = [(rot, pos) for rot in [0,180] for pos in range(left_col, right_col-1)] + [(rot, pos) for rot in [90,270] for pos in range(left_col, right_col)]
     elif piece in [Piece.S, Piece.Z]:
-        placements = [(0, pos) for pos in range(8)] + [(90, pos) for pos in range(9)]
+        placements = [(0, pos) for pos in range(left_col, right_col-1)] + [(90, pos) for pos in range(left_col, right_col)]
     elif piece == Piece.O:
-        placements = [(0, pos) for pos in range(9)]
+        placements = [(0, pos) for pos in range(left_col, right_col)]
     elif piece == Piece.I:
-        placements = [(0, pos) for pos in range(7)] + [(90, pos) for pos in range(10)]
+        placements = [(0, pos) for pos in range(left_col, right_col-2)] + [(90, pos) for pos in range(left_col, right_col+1)]
     
     for rotation, position in placements:
         new_board = Board([row[:] for row in board.rows])
@@ -29,12 +29,12 @@ def _get_boards(board: Board, pieces: List[Piece], first_move=None, first_hold=F
         if len(pieces) == 1:
             boards.append((new_board, move))
         else:
-            boards += _get_boards(new_board, pieces[1:], first_move=move)
+            boards += _get_boards(new_board, left_col, right_col, pieces[1:], first_move=move)
     
     return boards
 
 
-def generate_all_boards(state: GameState, depth: int, no_holes: bool=False) -> List[Tuple[Board, Move]]:
+def generate_all_boards(state: GameState, depth: int, left_col: int=0, right_col: int=9, no_holes: bool=False) -> List[Tuple[Board, Move]]:
     all_boards = []
 
     hold_seqs = [bin(i)[3:] for i in range(2**depth, 2**(depth+1))]
@@ -64,15 +64,15 @@ def generate_all_boards(state: GameState, depth: int, no_holes: bool=False) -> L
 
         first_hold = True if seq[0] == "1" else False
 
-        all_boards += _get_boards(state.board, pieces, first_hold=first_hold)
+        all_boards += _get_boards(state.board, left_col, right_col, pieces, first_hold=first_hold)
 
     return all_boards
 
 
-def count_holes(board: Board) -> int:
+def count_holes(board: Board, left_col: int=0, right_col: int=9) -> int:
     holes = 0
 
-    for i, height in enumerate(board.heights()):
+    for i, height in enumerate(board.heights()[left_col:right_col+1]):
         for j in range(height):
             if board.rows[j][i] == False:
                 holes += 1
@@ -80,13 +80,13 @@ def count_holes(board: Board) -> int:
     return holes
 
 
-def count_pits(board: Board) -> dict[int, int]:
+def count_pits(board: Board, left_col: int=0, right_col: int=9) -> Dict[int, int]:
     pits = dict.fromkeys(range(2,21), 0)
 
-    heights = board.heights()
+    heights = board.heights()[left_col:right_col+1]
     for i in range(0, len(heights)):
-        left = heights[i] if i == 0 else heights[i-1]
-        right = heights[i] if i == len(heights)-1 else heights[i+1]
+        left = heights[i] if i == left_col else heights[i-1]
+        right = heights[i] if i == right_col else heights[i+1]
 
         pit_height = min(left - heights[i], right - heights[i])
         if pit_height >= 2:
