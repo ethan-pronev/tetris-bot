@@ -13,6 +13,10 @@ class Client(ABC):
         pass
 
     @abstractmethod
+    def leave_room(self):
+        pass
+
+    @abstractmethod
     def get_game_state(self) -> GameState | None:
         pass
 

@@ -5,11 +5,11 @@ from strategies.sprint import SprintStrategy
 
 def main():
     controller = GameController(
-        pps=4.5,
+        pps=10,
         client=JstrisClient(headless=False),
         strategy=SprintStrategy(),
         room="join",
-        join_info="XT0658"
+        join_info="XGD4VF"
     )
 
     controller.start()

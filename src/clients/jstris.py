@@ -107,7 +107,10 @@ class JstrisClient(Client):
 	def join_room(self, code):
 		self.page.get(f"https://jstris.jezevec10.com/join/{code}")
 
-	def get_game_state(self) -> GameState:
+	def leave_room(self):
+		self.page.quit()
+
+	def get_game_state(self) -> GameState | None:
 		screenshot = self.page.find_element(By.ID, "main").screenshot_as_base64
 		image = Image.open(BytesIO(base64.b64decode(screenshot)))
 

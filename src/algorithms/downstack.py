@@ -4,45 +4,24 @@ import algorithms.utils as utils
 
 
 class DownstackAlgorithm(Algorithm):
-    def _count_holes(self, board: Board) -> int:
-        holes = 0
-
-        for i, height in enumerate(board.heights()):
-            for j in range(height):
-                if board.rows[j][i] == False:
-                    holes += 1
-        
-        return holes
-
-    def _count_pits(self, board: Board) -> int:
-        pits = 0
-
-        heights = board.heights()
-        for i in range(1, len(heights) - 1):
-            if heights[i-1] - heights[i] >= 3 and heights[i+1] - heights[i] >=3:
-                pits += 1
-        
-        return pits
-
+    def __init__(self):
+        self.hole_penalty = -300 # penalize holes
+        self.height_penalty = [0,0,0,0,0,0,0,0,0,0,0,-10,-20,-40,-80,-250,-500,-1000,-2000,-2000,-2000] # penalize height
+        self.height_diff_penalty = [-20,0,0,0,0,-30,-50,-60,-80,-100,-150,-200,-250,-300,-350,-400,-450,-500,-550,-600,-650] # penalize large height differences
+        self.pit_penalty = [0,0,-10,-50,-50,-60,-80,-100,-120,-150,-180,-210,-250,-300,-350,-400,-450,-500,-550,-600,-650] # penalize long 1-wide pits
 
     def _score(self, board: Board) -> int:
         score = 0
 
-        score += -200 * self._count_holes(board) # penalize holes
+        score += self.hole_penalty * utils.count_holes(board)
 
-        max_height = max(board.heights())
-        score += -10 * max_height # penalize height
-        if max_height > 10:
-            score += -20 * max_height
+        heights = board.heights()
+        score += self.height_penalty[max(heights)]
+        score += self.height_diff_penalty[max(heights) - min(heights)]
 
-        score += -30 * self._count_pits(board) # penalize long 1-wide pits
-
-        # holes = self._count_holes(board)
-        # height = max(board.heights())
-        # score += -100 * holes + -10 * height
-        # board.print()
-        # print(f"holes: {holes}, height: {height}, score: {score}")
-        # print("")
+        pits = utils.count_pits(board)
+        for pit_len, cnt in pits.items():
+            score += cnt * self.pit_penalty[pit_len]
 
         return score
 

@@ -67,3 +67,29 @@ def generate_all_boards(state: GameState, depth: int, no_holes: bool=False) -> L
         all_boards += _get_boards(state.board, pieces, first_hold=first_hold)
 
     return all_boards
+
+
+def count_holes(board: Board) -> int:
+    holes = 0
+
+    for i, height in enumerate(board.heights()):
+        for j in range(height):
+            if board.rows[j][i] == False:
+                holes += 1
+    
+    return holes
+
+
+def count_pits(board: Board) -> dict[int, int]:
+    pits = dict.fromkeys(range(2,21), 0)
+
+    heights = board.heights()
+    for i in range(0, len(heights)):
+        left = heights[i] if i == 0 else heights[i-1]
+        right = heights[i] if i == len(heights)-1 else heights[i+1]
+
+        pit_height = min(left - heights[i], right - heights[i])
+        if pit_height >= 2:
+            pits[pit_height] += 1
+    
+    return pits
